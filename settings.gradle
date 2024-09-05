@@ -1,3 +1,3 @@
-rootProject.name = 'jigeum'
+rootProject.name = 'roomit'
 
-include 'jigeum-api', 'jigeum-domain'
+include 'roomit-api', 'roomit-domain'
