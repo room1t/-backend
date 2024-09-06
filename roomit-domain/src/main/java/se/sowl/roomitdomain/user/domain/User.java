@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
 
@@ -24,6 +25,7 @@ public class User {
     @Column(nullable = false)
     private String name;
 
+    @Size(min = 2, max = 15, message = "닉네임은 2자 이상 15자 이하여야 합니다.")
     private String nickname;
 
     @Column(unique = true, nullable = false)
