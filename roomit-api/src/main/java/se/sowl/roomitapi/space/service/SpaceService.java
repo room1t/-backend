@@ -13,6 +13,7 @@ import java.util.List;
 public class SpaceService {
     public List<Space> getSpaces(PageRequest pageRequest) {
         // TODO: STEP1: 빈 서비스를 만든다.
+        // TODO: STEP7: 테스트가 성공하도록 메서드 완성하기
         return Collections.emptyList();
     }
 }

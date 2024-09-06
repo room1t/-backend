@@ -76,10 +76,14 @@ class SpaceServiceTest {
             userRepository.save(user);
             PageRequest request = PageRequest.of(0, 10);
 
+            // TODO: STEP4:(동준형이 했으면 하는 것) Post 엔티티 여러개 생성.
+            // TODO: STEP5: postRepository 에 저장
+
             // when
             List<Space> spaces = spaceService.getSpaces(request);
 
             // then
+            // TODO: STEP6: 조회된 post 개수 및 데이터 검증
             assertThat(spaces.size()).isEqualTo(10);
         }
     }
