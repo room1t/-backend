@@ -10,13 +10,18 @@ import java.util.List;
 @Entity
 @Table(name = "provider")
 public class Provider {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, unique = true)
     private String name;
 
+    @OneToOne(mappedBy = "provider")
+    private User user;
+
+
+    /*
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -27,6 +32,6 @@ public class Provider {
 
     @OneToMany(mappedBy = "provider")
     private List<User> users;
-
+    */
     // Getters and setters
 }

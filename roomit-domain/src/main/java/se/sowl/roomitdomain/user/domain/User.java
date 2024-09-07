@@ -32,7 +32,8 @@ public class User {
     private String email;
 
     @Column(nullable = false)
-    private String provider;
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Provider provider_id;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -43,11 +44,11 @@ public class User {
     private LocalDateTime updatedAt;
 
     @Builder
-    public User(Long id, String name, String nickname, String email, String provider) {
+    public User(Long id, String name, String nickname, String email, Provider provider_id) {
         this.id = id;
         this.name = name;
         this.nickname = nickname;
         this.email = email;
-        this.provider = provider;
+        this.provider_id = provider_id;
     }
 }
