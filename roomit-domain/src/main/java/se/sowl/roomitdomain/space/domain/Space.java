@@ -44,4 +44,14 @@ public class Space {
 
     @OneToMany(mappedBy = "space")
     private List<SpaceDetail> spaceDetails;
+
+    @Builder
+    public Space(String name, String description, String address, Integer maxCapacity, User owner) {
+        this.name = name;
+        this.description = description;
+        this.address = address;
+        this.maxCapacity = maxCapacity;
+        this.owner = owner;
+    }
+
 }

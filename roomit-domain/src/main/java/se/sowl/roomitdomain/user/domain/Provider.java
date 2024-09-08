@@ -1,12 +1,18 @@
 package se.sowl.roomitdomain.user.domain;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 @Entity
 @Table(name = "provider")
 public class Provider {
@@ -20,6 +26,12 @@ public class Provider {
     @OneToOne(mappedBy = "provider")
     private User user;
 
+    @Builder
+    public Provider(Long id, String name, User user) {
+        this.id = id;
+        this.name = name;
+        this.user = user;
+    }
 
     /*
     @CreationTimestamp

@@ -7,12 +7,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
+import se.sowl.roomitapi.fixture.SpaceFixture;
 import se.sowl.roomitapi.fixture.UserFixture;
 import se.sowl.roomitdomain.space.domain.Space;
 import se.sowl.roomitdomain.space.repository.SpaceRepository;
+import se.sowl.roomitdomain.user.domain.Provider;
 import se.sowl.roomitdomain.user.domain.User;
+import se.sowl.roomitdomain.user.domain.UserRole;
 import se.sowl.roomitdomain.user.repository.UserRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -55,7 +59,16 @@ class SpaceServiceTest {
             // TODO: (given)은 테스트하고자 하는 메서드를 실행하기 전에 하는 사전작업,
             // TODO: 주로 테스트할 객체를 생성하거나 초기화하는 작업을 한다.
             // given
-            User user = UserFixture.createUser(1L, "박징수", "수박수박", "hwa52@gmail.com", "google");
+            Provider provider = Provider.builder()
+                    .id(1L)
+                    .name("google")
+                    .build();
+            UserRole userRole = UserRole.builder()
+                    .id(1L)
+                    .role("user")
+                    .build();
+
+            User user = UserFixture.createUser(1L, "박징수", "수박수박", "hwa52@gmail.com", provider,userRole);
             userRepository.save(user);
             PageRequest request = PageRequest.of(0, 10);
 
@@ -72,15 +85,55 @@ class SpaceServiceTest {
         @DisplayName("사용자가 공간 목록을 조회하면 조회 조건에 맞게 응답한다")
         void condition() {
             // given
-            User user = UserFixture.createUser(1L, "박징수", "수박수박", "hwa52@gmail.com", "google");
+            Provider provider = Provider.builder()
+                    .id(1L)
+                    .name("google")
+                    .build();
+
+            UserRole userRole = UserRole.builder()
+                    .id(1L)
+                    .role("user")
+                    .build();
+
+            User user = User.builder()
+                    .id(1L)
+                    .name("박징수")
+                    .nickname("수박수박")
+                    .email("hwa52@gmail.com")
+                    .provider(provider)
+                    .userRole(userRole)
+                    .build();
+
+            /*
+            provider.setUser(user);
+            userRole.setUser(user);
+            */
+
             userRepository.save(user);
             PageRequest request = PageRequest.of(0, 10);
 
             // TODO: STEP4:(동준형이 했으면 하는 것) Post 엔티티 여러개 생성.
+
+            Space space0 = SpaceFixture.createSpace("도서관","30명의 인원을 수용할 수 있다.","testAddress",1,user);
+            List<Space> spaces = new ArrayList<>();
+
+            for(int i=0;i<17;i++){
+                Space space = Space.builder()
+                        .name("testName")
+                        .description("testDescription")
+                        .address("testAddresss")
+                        .maxCapacity(1)
+                        .owner(user)
+                        .build();
+                spaceRepository.save(space);
+                spaces.add(space);
+            }
             // TODO: STEP5: postRepository 에 저장
 
+            spaceRepository.save(space0);
+
             // when
-            List<Space> spaces = spaceService.getSpaces(request);
+            List<Space> Spaces = spaceService.getSpaces(request);
 
             // then
             // TODO: STEP6: 조회된 post 개수 및 데이터 검증

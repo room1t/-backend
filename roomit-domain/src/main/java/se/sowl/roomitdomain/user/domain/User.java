@@ -31,9 +31,13 @@ public class User {
     @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(nullable = false)
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Provider provider_id;
+    @JoinColumn(name = "provider_id", referencedColumnName = "id")
+    private Provider provider;
+
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "userRole_id", referencedColumnName = "id")
+    private UserRole userRole;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -44,11 +48,12 @@ public class User {
     private LocalDateTime updatedAt;
 
     @Builder
-    public User(Long id, String name, String nickname, String email, Provider provider_id) {
+    public User(Long id, String name, String nickname, String email, Provider provider,UserRole userRole) {
         this.id = id;
         this.name = name;
         this.nickname = nickname;
         this.email = email;
-        this.provider_id = provider_id;
+        this.provider = provider;
+        this.userRole = userRole;
     }
 }
