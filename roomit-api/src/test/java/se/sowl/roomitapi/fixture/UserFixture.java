@@ -1,18 +1,20 @@
 package se.sowl.roomitapi.fixture;
 
 import se.sowl.roomitapi.oauth.domain.TestOAuth2User;
+import se.sowl.roomitdomain.user.domain.Provider;
 import se.sowl.roomitdomain.user.domain.User;
 import se.sowl.roomitdomain.user.domain.CustomOAuth2User;
+import se.sowl.roomitdomain.user.domain.UserRole;
 
 
 public class UserFixture {
-    public static User createUser(Long id, String name, String nickname, String email, String provider) {
+    public static User createUser(String name, String nickname, String email, Provider provider, UserRole userRole) {
         return User.builder()
-                .id(id)
                 .name(name)
                 .nickname(nickname)
                 .email(email)
                 .provider(provider)
+                .userRole(userRole)
                 .build();
     }
 

@@ -13,18 +13,14 @@ import lombok.NoArgsConstructor;
 public class UserRole {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, unique = true)
     private String role;
 
-    @OneToOne(mappedBy = "userRole")
-    private User user;
-
     @Builder
-    public UserRole(Long id,String role, User user) {
-        this.id = id;
+    public UserRole(String role) {
         this.role = role;
-        this.user = user;
     }
 }

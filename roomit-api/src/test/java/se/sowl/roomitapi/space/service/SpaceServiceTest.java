@@ -1,20 +1,20 @@
 package se.sowl.roomitapi.space.service;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import se.sowl.roomitapi.fixture.SpaceFixture;
 import se.sowl.roomitapi.fixture.UserFixture;
+import se.sowl.roomitdomain.oauth.domain.OAuth2Provider;
 import se.sowl.roomitdomain.space.domain.Space;
 import se.sowl.roomitdomain.space.repository.SpaceRepository;
 import se.sowl.roomitdomain.user.domain.Provider;
 import se.sowl.roomitdomain.user.domain.User;
 import se.sowl.roomitdomain.user.domain.UserRole;
+import se.sowl.roomitdomain.user.repository.ProviderRepository;
 import se.sowl.roomitdomain.user.repository.UserRepository;
+import se.sowl.roomitdomain.user.repository.UserRoleRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +23,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SpaceServiceTest {
     @Autowired
     private SpaceService spaceService;
@@ -33,6 +34,12 @@ class SpaceServiceTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private ProviderRepository providerRepository;
+
+    @Autowired
+    private UserRoleRepository userRoleRepository;
+
     // 테스트가 끝날 때 마다 실행되는 어노테이션.
     // 테스트가 끝날 때 마다 데이터를 삭제해야 다른 테스트코드를 실행했을 떄 영향을 받지 않게끔 할 수 있슴다.
     @AfterEach
@@ -40,6 +47,21 @@ class SpaceServiceTest {
         userRepository.deleteAllInBatch();
         spaceRepository.deleteAllInBatch();
     }
+
+    @BeforeAll
+    void setUp() {
+        Provider google = new Provider(OAuth2Provider.GOOGLE.getRegistrationId());
+        Provider kakao = new Provider(OAuth2Provider.KAKAO.getRegistrationId());
+        Provider naver = new Provider(OAuth2Provider.NAVER.getRegistrationId());
+
+        UserRole user = new UserRole("user");
+        UserRole owner = new UserRole("owner");
+        UserRole admin = new UserRole("admin");
+
+        providerRepository.saveAll(List.of(google, kakao, naver));
+        userRoleRepository.saveAll(List.of(user,owner,admin));
+    }
+
 
     // NESTED 란 테스트 클래스를 만들어서 테스트 코드를 구조화하는 방법.
     // 서비스 메서드 테스트를 만들때 하나의 메서드에서 여러개의 변수 상황이 있을 수 있으므로 NESTED 를 사용해 테스트 코드를 구조화!
@@ -59,17 +81,7 @@ class SpaceServiceTest {
             // TODO: (given)은 테스트하고자 하는 메서드를 실행하기 전에 하는 사전작업,
             // TODO: 주로 테스트할 객체를 생성하거나 초기화하는 작업을 한다.
             // given
-            Provider provider = Provider.builder()
-                    .id(1L)
-                    .name("google")
-                    .build();
-            UserRole userRole = UserRole.builder()
-                    .id(1L)
-                    .role("user")
-                    .build();
 
-            User user = UserFixture.createUser(1L, "박징수", "수박수박", "hwa52@gmail.com", provider,userRole);
-            userRepository.save(user);
             PageRequest request = PageRequest.of(0, 10);
 
             // TODO: (when)은 테스트하고자 하는 메서드를 실행하는 작업
@@ -85,59 +97,37 @@ class SpaceServiceTest {
         @DisplayName("사용자가 공간 목록을 조회하면 조회 조건에 맞게 응답한다")
         void condition() {
             // given
-            Provider provider = Provider.builder()
-                    .id(1L)
-                    .name("google")
-                    .build();
 
-            UserRole userRole = UserRole.builder()
-                    .id(1L)
-                    .role("user")
-                    .build();
+            String providerRegistrationId = OAuth2Provider.GOOGLE.getRegistrationId();
+            Provider provider = providerRepository.findByName(providerRegistrationId);
 
-            User user = User.builder()
-                    .id(1L)
-                    .name("박징수")
-                    .nickname("수박수박")
-                    .email("hwa52@gmail.com")
-                    .provider(provider)
-                    .userRole(userRole)
-                    .build();
+            UserRole userRole = userRoleRepository.findByRole("user");
 
-            /*
-            provider.setUser(user);
-            userRole.setUser(user);
-            */
+            User user = UserFixture.createUser("박동준","dj","dj@test.com",provider,userRole);
 
-            userRepository.save(user);
             PageRequest request = PageRequest.of(0, 10);
 
-            // TODO: STEP4:(동준형이 했으면 하는 것) Post 엔티티 여러개 생성.
+            // TODO: STEP4:(동준형이 했으면 하는 것) Space 엔티티 여러개 생성.
 
-            Space space0 = SpaceFixture.createSpace("도서관","30명의 인원을 수용할 수 있다.","testAddress",1,user);
             List<Space> spaces = new ArrayList<>();
 
             for(int i=0;i<17;i++){
-                Space space = Space.builder()
-                        .name("testName")
-                        .description("testDescription")
-                        .address("testAddresss")
-                        .maxCapacity(1)
-                        .owner(user)
-                        .build();
-                spaceRepository.save(space);
+
+                // SpaceDetail <- space 넣어야 함 space <- spaceDetail 필요함. 순환참조?
+                Space space = SpaceFixture.createSpace("이디야","최대 9인석 가능","성공회대 이디야",9,user);
+
                 spaces.add(space);
             }
             // TODO: STEP5: postRepository 에 저장
 
-            spaceRepository.save(space0);
+            spaceRepository.saveAll(spaces);
 
             // when
             List<Space> Spaces = spaceService.getSpaces(request);
 
             // then
             // TODO: STEP6: 조회된 post 개수 및 데이터 검증
-            assertThat(spaces.size()).isEqualTo(10);
+            assertThat(spaces.size()).isEqualTo(17);
         }
     }
 }

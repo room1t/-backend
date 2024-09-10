@@ -11,8 +11,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import se.sowl.roomitapi.oauth.factory.OAuth2UserFactory;
 import se.sowl.roomitdomain.oauth.domain.*;
+import se.sowl.roomitdomain.user.domain.Provider;
 import se.sowl.roomitdomain.user.domain.User;
+import se.sowl.roomitdomain.user.repository.ProviderRepository;
 import se.sowl.roomitdomain.user.repository.UserRepository;
+
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -22,6 +26,7 @@ public class OAuthService implements OAuth2UserService<OAuth2UserRequest, OAuth2
     private final UserRepository userRepository;
     private final DefaultOAuth2UserService defaultOAuth2UserService;
     private final OAuth2UserFactory oAuth2UserFactory;
+    private final ProviderRepository providerRepository;
 
     @Override
     @Transactional
@@ -35,9 +40,10 @@ public class OAuthService implements OAuth2UserService<OAuth2UserRequest, OAuth2
 
     private OAuth2Profile extractOAuth2Profile(OAuth2UserRequest userRequest, OAuth2User oAuth2User) {
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
-        OAuth2Provider provider = OAuth2Provider.valueOf(registrationId.toUpperCase());
-        OAuth2Profile profile = OAuth2Extractor.extract(provider, oAuth2User.getAttributes());
-        profile.setProvider(registrationId);
+        OAuth2Provider providerValue = OAuth2Provider.valueOf(registrationId.toUpperCase());
+        OAuth2Profile profile = OAuth2Extractor.extract(providerValue, oAuth2User.getAttributes());
+        Provider provider = providerRepository.findByName(registrationId);
+        profile.setProvider(provider);
         return profile;
     }
 

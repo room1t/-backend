@@ -18,19 +18,15 @@ import java.util.List;
 public class Provider {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, unique = true)
     private String name;
 
-    @OneToOne(mappedBy = "provider")
-    private User user;
-
     @Builder
-    public Provider(Long id, String name, User user) {
-        this.id = id;
+    public Provider(String name) {
         this.name = name;
-        this.user = user;
     }
 
     /*

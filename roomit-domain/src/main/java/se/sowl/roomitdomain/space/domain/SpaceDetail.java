@@ -2,6 +2,7 @@ package se.sowl.roomitdomain.space.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -41,4 +42,13 @@ public class SpaceDetail {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    @Builder
+    public SpaceDetail(Space space, String name, String description, Integer capacity, Double pricePerHour) {
+        this.space = space;
+        this.name = name;
+        this.description = description;
+        this.capacity = capacity;
+        this.pricePerHour = pricePerHour;
+    }
 }
