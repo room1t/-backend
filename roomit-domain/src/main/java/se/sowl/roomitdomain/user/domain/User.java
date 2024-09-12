@@ -31,11 +31,11 @@ public class User {
     @Column(unique = true, nullable = false)
     private String email;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "provider_id", referencedColumnName = "id")
     private Provider provider;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "userrole_id", referencedColumnName = "id")
     private UserRole userrole;
 

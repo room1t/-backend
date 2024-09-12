@@ -4,11 +4,14 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import se.sowl.roomitapi.fixture.SpaceFixture;
 import se.sowl.roomitapi.fixture.UserFixture;
 import se.sowl.roomitdomain.oauth.domain.OAuth2Provider;
 import se.sowl.roomitdomain.space.domain.Space;
+import se.sowl.roomitdomain.space.domain.SpaceDetail;
 import se.sowl.roomitdomain.space.repository.SpaceRepository;
+import se.sowl.roomitdomain.space.spaceDto.SpaceResponseDto;
 import se.sowl.roomitdomain.user.domain.Provider;
 import se.sowl.roomitdomain.user.domain.User;
 import se.sowl.roomitdomain.user.domain.UserRole;
@@ -44,8 +47,8 @@ class SpaceServiceTest {
     // 테스트가 끝날 때 마다 데이터를 삭제해야 다른 테스트코드를 실행했을 떄 영향을 받지 않게끔 할 수 있슴다.
     @AfterEach
     void tearDown() {
-        userRepository.deleteAllInBatch();
-        spaceRepository.deleteAllInBatch();
+        spaceRepository.deleteAllInBatch(); // 자식. user_id _> owner_id로 쓰고있다.
+        userRepository.deleteAllInBatch(); // 부모. user_id 를 가지고있다.
     }
 
     @BeforeAll
@@ -61,7 +64,6 @@ class SpaceServiceTest {
         providerRepository.saveAll(List.of(google, kakao, naver));
         userRoleRepository.saveAll(List.of(user,owner,admin));
     }
-
 
     // NESTED 란 테스트 클래스를 만들어서 테스트 코드를 구조화하는 방법.
     // 서비스 메서드 테스트를 만들때 하나의 메서드에서 여러개의 변수 상황이 있을 수 있으므로 NESTED 를 사용해 테스트 코드를 구조화!
@@ -86,7 +88,7 @@ class SpaceServiceTest {
 
             // TODO: (when)은 테스트하고자 하는 메서드를 실행하는 작업
             // when
-            List<Space> spaces = spaceService.getSpaces(request);
+            List<SpaceResponseDto> spaces = spaceService.getSpaces(request);
 
             // TODO: (then)은 테스트하고자 하는 메서드를 실행한 결과를 검증하는 작업!
             // then
@@ -103,18 +105,39 @@ class SpaceServiceTest {
 
             UserRole userRole = userRoleRepository.findByRole("user");
 
-            User user = UserFixture.createUser("박동준","dj","dj@test.com",provider,userRole);
+            User user = userRepository.save(UserFixture.createUser("박동준", "dj", "dj@test.com", provider, userRole));
 
             PageRequest request = PageRequest.of(0, 10);
 
             // TODO: STEP4:(동준형이 했으면 하는 것) Space 엔티티 여러개 생성.
 
             List<Space> spaces = new ArrayList<>();
+            List<SpaceDetail> spaceDetails = new ArrayList<>();
 
-            for(int i=0;i<17;i++){
+            for(int i=0;i<10;i++){ // 10개의 space,
+                Space space = Space.builder()
+                        .name("이디야")
+                        .description("성공회대 앞 2층")
+                        .address("구로구 어쩌구")
+                        .maxCapacity(30)
+                        .owner(user)
+                        .build();
 
-                // SpaceDetail <- space 넣어야 함 space <- spaceDetail 필요함. 순환참조?
-                Space space = SpaceFixture.createSpace("이디야","최대 9인석 가능","성공회대 이디야",9,user);
+                SpaceDetail spaceDetail;
+
+                for(int j=0;j<3;j++) { // 30개의 spaceDeatil
+                    spaceDetail = SpaceDetail.builder()
+                            .space(space)
+                            .name("테이블1")
+                            .description("원형입니다")
+                            .capacity(8)
+                            .pricePerHour(1.0)
+                            .build();
+
+                    spaceDetails.add(spaceDetail);
+                }
+
+                space.addSpaceDetails(spaceDetails);
 
                 spaces.add(space);
             }
@@ -123,11 +146,11 @@ class SpaceServiceTest {
             spaceRepository.saveAll(spaces);
 
             // when
-            List<Space> Spaces = spaceService.getSpaces(request);
+            List<SpaceResponseDto> result = spaceService.getSpaces(request);
 
             // then
             // TODO: STEP6: 조회된 post 개수 및 데이터 검증
-            assertThat(spaces.size()).isEqualTo(17);
+            assertThat(result.size()).isEqualTo(10);
         }
     }
 }

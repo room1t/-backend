@@ -7,6 +7,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import se.sowl.roomitdomain.user.domain.User;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -46,12 +47,22 @@ public class Space {
     private List<SpaceDetail> spaceDetails;
 
     @Builder
-    public Space(String name, String description, String address, Integer maxCapacity, User owner) {
+    public Space(String name, String description, String address, Integer maxCapacity, User owner,List<SpaceDetail> spaceDetails) {
         this.name = name;
         this.description = description;
         this.address = address;
         this.maxCapacity = maxCapacity;
         this.owner = owner;
+        this.spaceDetails = spaceDetails;
+    }
+
+    public void addSpaceDetails(List<SpaceDetail> spaceDetails) {
+        if (this.spaceDetails == null) {
+            this.spaceDetails = new ArrayList<>();
+        }
+        for (SpaceDetail spaceDetail : spaceDetails) {
+            this.spaceDetails.add(spaceDetail);
+        }
     }
 
 }
