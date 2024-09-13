@@ -6,6 +6,7 @@ import se.sowl.roomitdomain.space.SpaceDetailDto.SpaceDetailResponseDto;
 import se.sowl.roomitdomain.space.domain.SpaceDetail;
 import se.sowl.roomitdomain.space.repository.SpaceDetailRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -14,7 +15,22 @@ public class SpaceDetailService {
     SpaceDetailRepository spaceDetailRepository;
 
     public List<SpaceDetailResponseDto> getSpaceDetailResponseDtos() {
-        return spaceDetailRepository.findAll();
+        List<SpaceDetail> spaceDetails = spaceDetailRepository.findAll();
+
+        List<SpaceDetailResponseDto> spaceDetailResponseDtos = new ArrayList<>();
+
+        for (SpaceDetail spaceDetail : spaceDetails) {
+            String name = spaceDetail.getName();
+            String description = spaceDetail.getDescription();
+            Integer capacity = spaceDetail.getCapacity();
+            Double pricePerHour = spaceDetail.getPricePerHour();
+
+            SpaceDetailResponseDto spaceDetailResponseDto = new SpaceDetailResponseDto(name, description, capacity, pricePerHour);
+
+            spaceDetailResponseDtos.add(spaceDetailResponseDto);
+        }
+
+        return spaceDetailResponseDtos;
     }
 
 }

@@ -43,7 +43,7 @@ public class Space {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "space")
+    @OneToMany(mappedBy = "space",fetch = FetchType.EAGER)
     private List<SpaceDetail> spaceDetails;
 
     @Builder

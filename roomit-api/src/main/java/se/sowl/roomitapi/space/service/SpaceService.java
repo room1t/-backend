@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import se.sowl.roomitdomain.space.SpaceDetailDto.SpaceDetailResponseDto;
 import se.sowl.roomitdomain.space.domain.Space;
 import se.sowl.roomitdomain.space.domain.SpaceDetail;
 import se.sowl.roomitdomain.space.repository.SpaceRepository;
@@ -51,6 +52,32 @@ public class SpaceService {
                 .address(space.getAddress())
                 .maxCapacity(space.getMaxCapacity())
                 .build();
+    }
+
+    public List<SpaceDetailResponseDto> getSpaceDetail(Long spaceId) {
+        Space space = spaceRepository.findById(spaceId).orElse(null);
+
+        List<SpaceDetail> spaceDetails = space.getSpaceDetails();
+
+        List<SpaceDetailResponseDto> spaceDetailResponseDtos = new ArrayList<>();
+
+        for(SpaceDetail spaceDetail : spaceDetails) {
+            String name = spaceDetail.getName();
+            String description = spaceDetail.getDescription();
+            Integer capacity = spaceDetail.getCapacity();
+            Double pricePerHour = spaceDetail.getPricePerHour();
+
+            SpaceDetailResponseDto spaceDetailResponseDto = SpaceDetailResponseDto.builder()
+                .name(name)
+                .description(description)
+                .capacity(capacity)
+                .pricePerHour(pricePerHour)
+                .build();
+
+            spaceDetailResponseDtos.add(spaceDetailResponseDto);
+        }
+
+        return spaceDetailResponseDtos;
     }
 
 }

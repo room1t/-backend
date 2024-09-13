@@ -14,6 +14,7 @@ import se.sowl.roomitdomain.oauth.domain.OAuth2Provider;
 import se.sowl.roomitdomain.space.SpaceDetailDto.SpaceDetailResponseDto;
 import se.sowl.roomitdomain.space.domain.Space;
 import se.sowl.roomitdomain.space.domain.SpaceDetail;
+import se.sowl.roomitdomain.space.repository.SpaceDetailRepository;
 import se.sowl.roomitdomain.space.repository.SpaceRepository;
 import se.sowl.roomitdomain.space.spaceDto.SpaceResponseDto;
 import se.sowl.roomitdomain.user.domain.Provider;
@@ -50,10 +51,14 @@ class SpaceServiceTest {
     @Autowired
     private SpaceDetailService spaceDetailService;
 
+    @Autowired
+    private SpaceDetailRepository spaceDetailRepository;
+
     // 테스트가 끝날 때 마다 실행되는 어노테이션.
     // 테스트가 끝날 때 마다 데이터를 삭제해야 다른 테스트코드를 실행했을 떄 영향을 받지 않게끔 할 수 있슴다.
     @AfterEach
     void tearDown() {
+        spaceDetailRepository.deleteAllInBatch();
         spaceRepository.deleteAllInBatch(); // 자식. user_id _> owner_id로 쓰고있다.
         userRepository.deleteAllInBatch(); // 부모. user_id 를 가지고있다.
     }
@@ -181,21 +186,69 @@ class SpaceServiceTest {
 
             //when
 
-
             //then
 
-            assertThat(spaceDetailResponseDtos).isEqualTo(0);
+            assertThat(spaceDetailResponseDtos).isEqualTo(new ArrayList<SpaceDetailResponseDto>());
         }
 
         @Test
+        @Transactional
         @DisplayName("사용자가 세부 공간을 조회하면 조회 조건에 맞게 응답한다")
         void getSpaceDetail() {
             //space 하나 만든다
             //만든 space에 대해 spaceDetail을 넣는다
             // space의 id값을 통해 spaceDetail을 조회한다.
 
+            //given
+            String providerRegistrationId = OAuth2Provider.GOOGLE.getRegistrationId();
+            Provider provider = providerRepository.findByName(providerRegistrationId);
 
+            UserRole userRole = userRoleRepository.findByRole("user");
+            User user = userRepository.save(UserFixture.createUser("박동준", "dj", "dj@test.com", provider, userRole));
 
+            Space space = Space.builder()
+                .name("이디야")
+                .description("2층에 있음")
+                .address("구로구 ~")
+                .maxCapacity(30)
+                .owner(user)
+                .build();
+            // spaceDetail이 저장 안된상태
+            space = spaceRepository.save(space);
+
+            List<SpaceDetail> spaceDetails = new ArrayList<>();
+
+            for(int i=0;i<3;i++){
+                SpaceDetail spaceDetail = SpaceDetail.builder()
+                    .space(space)
+                    .name("방" + (i+1))
+                    .capacity(4)
+                    .description("원형탁자가 있음")
+                    .pricePerHour(1.3)
+                    .build();
+
+                spaceDetailRepository.save(spaceDetail);
+
+                spaceDetails.add(spaceDetail);
+            }
+            // space 생성
+            space.addSpaceDetails(spaceDetails);
+            space = spaceRepository.save(space);
+
+            //when
+            // space의 id값을 통해 spaceDetails을 조회해야한다.
+            // spaceService사용
+
+            Long spaceId = space.getId();
+            // 232줄 디버그 결과 space id가 null spaceDetail도 id가 null로 저장이된다.
+            // id값을 명시적으로 넣어서 테스트를 해야 할 듯?
+
+            List<SpaceDetailResponseDto> spaceDetailResponseDtos = spaceService.getSpaceDetail(spaceId);
+
+            //then
+
+            assertThat(spaceDetailResponseDtos.size()).isEqualTo(3);
+            assertThat(spaceDetailResponseDtos.get(0)).isExactlyInstanceOf(SpaceDetailResponseDto.class);
         }
 
     }
