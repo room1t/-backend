@@ -182,7 +182,29 @@ class SpaceServiceTest {
         void emptySpaceDetail() {
 
             //given
-            List<SpaceDetailResponseDto> spaceDetailResponseDtos = spaceDetailService.getSpaceDetailResponseDtos();
+            // user만들고 space만들기
+
+            String providerRegistrationId = OAuth2Provider.GOOGLE.getRegistrationId();
+            Provider provider = providerRepository.findByName(providerRegistrationId);
+
+            UserRole userRole = userRoleRepository.findByRole("user");
+
+            User user = userRepository.save(UserFixture.createUser("dj","djdj", "dj@email",provider,userRole));
+
+            Space space = Space.builder()
+                .name("이디야")
+                .description("2층에 있음")
+                .address("구로구 ~")
+                .maxCapacity(30)
+                .owner(user)
+                .build();
+
+            spaceRepository.save(space);
+
+            Long spaceId = space.getId();
+
+            //getSpaceDetailResponseDto의 인자로 SpaceId를 넣어주어야 함
+            List<SpaceDetailResponseDto> spaceDetailResponseDtos = spaceDetailService.getSpaceDetail(spaceId);
 
             //when
 
@@ -243,7 +265,7 @@ class SpaceServiceTest {
             // 232줄 디버그 결과 space id가 null spaceDetail도 id가 null로 저장이된다.
             // id값을 명시적으로 넣어서 테스트를 해야 할 듯?
 
-            List<SpaceDetailResponseDto> spaceDetailResponseDtos = spaceService.getSpaceDetail(spaceId);
+            List<SpaceDetailResponseDto> spaceDetailResponseDtos = spaceDetailService.getSpaceDetail(spaceId);
 
             //then
 

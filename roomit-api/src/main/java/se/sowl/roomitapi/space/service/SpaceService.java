@@ -54,30 +54,4 @@ public class SpaceService {
                 .build();
     }
 
-    public List<SpaceDetailResponseDto> getSpaceDetail(Long spaceId) {
-        Space space = spaceRepository.findById(spaceId).orElse(null);
-
-        List<SpaceDetail> spaceDetails = space.getSpaceDetails();
-
-        List<SpaceDetailResponseDto> spaceDetailResponseDtos = new ArrayList<>();
-
-        for(SpaceDetail spaceDetail : spaceDetails) {
-            String name = spaceDetail.getName();
-            String description = spaceDetail.getDescription();
-            Integer capacity = spaceDetail.getCapacity();
-            Double pricePerHour = spaceDetail.getPricePerHour();
-
-            SpaceDetailResponseDto spaceDetailResponseDto = SpaceDetailResponseDto.builder()
-                .name(name)
-                .description(description)
-                .capacity(capacity)
-                .pricePerHour(pricePerHour)
-                .build();
-
-            spaceDetailResponseDtos.add(spaceDetailResponseDto);
-        }
-
-        return spaceDetailResponseDtos;
-    }
-
 }
