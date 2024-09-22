@@ -3,6 +3,7 @@ package se.sowl.roomitdomain.space.SpaceDetailDto;
 import lombok.Builder;
 import lombok.Data;
 import se.sowl.roomitdomain.space.domain.Space;
+import se.sowl.roomitdomain.space.domain.SpaceDetail;
 
 @Data
 public class SpaceDetailResponseDto {
@@ -20,4 +21,12 @@ public class SpaceDetailResponseDto {
         this.pricePerHour = pricePerHour;
     }
 
+    public static SpaceDetailResponseDto toDTO(SpaceDetail spaceDetail){
+        return SpaceDetailResponseDto.builder()
+                .name(spaceDetail.getName())
+                .description(spaceDetail.getDescription())
+                .capacity(spaceDetail.getCapacity())
+                .pricePerHour(spaceDetail.getPricePerHour())
+                .build();
+    }
 }

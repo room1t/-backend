@@ -28,7 +28,7 @@ public class Space {
     @Column
     private String address;
 
-    @Column
+    @Column(name = "max_capacity")
     private Integer maxCapacity;
 
     @ManyToOne
@@ -43,11 +43,11 @@ public class Space {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "space",fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "space", fetch = FetchType.LAZY)
     private List<SpaceDetail> spaceDetails;
 
     @Builder
-    public Space(String name, String description, String address, Integer maxCapacity, User owner,List<SpaceDetail> spaceDetails) {
+    public Space(String name, String description, String address, Integer maxCapacity, User owner, List<SpaceDetail> spaceDetails) {
         this.name = name;
         this.description = description;
         this.address = address;
@@ -57,12 +57,11 @@ public class Space {
     }
 
     public void addSpaceDetails(List<SpaceDetail> spaceDetails) {
+        System.out.println(spaceDetails == null);
         if (this.spaceDetails == null) {
             this.spaceDetails = new ArrayList<>();
+            return;
         }
-        for (SpaceDetail spaceDetail : spaceDetails) {
-            this.spaceDetails.add(spaceDetail);
-        }
+        this.spaceDetails = spaceDetails;
     }
-
 }
