@@ -2,6 +2,7 @@ package se.sowl.roomitdomain.reservation.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -45,4 +46,13 @@ public class Reservation {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    @Builder
+    public Reservation(User user, SpaceDetail spaceDetail, ReservationStatus status, LocalDateTime startTime, LocalDateTime endTime) {
+        this.user = user;
+        this.spaceDetail = spaceDetail;
+        this.status = status;
+        this.startTime = startTime;
+        this.endTime = endTime;
+    }
 }

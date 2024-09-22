@@ -2,6 +2,7 @@ package se.sowl.roomitdomain.reservation.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -33,5 +34,8 @@ public class ReservationStatus {
     @OneToMany(mappedBy = "status")
     private List<Reservation> reservations;
 
-    // Getters and setters
+    @Builder
+    public ReservationStatus(String name) {
+        this.name = name;
+    }
 }
