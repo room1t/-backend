@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import se.sowl.roomitapi.reservation.exception.AlreadyReservedTimeException;
 
 @Slf4j
 @ResponseBody
@@ -24,5 +25,11 @@ public class RestControllerAdvice {
     public CommonResponse<Void> handleRuntimeException(RuntimeException e) {
         log.error("RuntimeException", e);
         return CommonResponse.fail("서버에 문제가 생겼어요. 잠시 후 다시 시도해주세요.");
+    }
+
+    @ExceptionHandler(AlreadyReservedTimeException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public CommonResponse<Void> handleAlreadyReservedTimeException(AlreadyReservedTimeException e) {
+        return CommonResponse.fail(e.getMessage());
     }
 }
