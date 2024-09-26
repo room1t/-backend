@@ -43,16 +43,22 @@ public class OAuthServiceTest {
     @AfterEach
     void tearDown() {
         userRepository.deleteAllInBatch();
+        providerRepository.deleteAllInBatch();
     }
 
-    @BeforeAll
+    @AfterAll
+    void cleanUp() {
+        userRepository.deleteAllInBatch();
+        providerRepository.deleteAllInBatch();
+    }
+
+    @BeforeEach
     void setUpOnce() {
         Provider google = new Provider(OAuth2Provider.GOOGLE.getRegistrationId());
         Provider kakao = new Provider(OAuth2Provider.KAKAO.getRegistrationId());
         Provider naver = new Provider(OAuth2Provider.NAVER.getRegistrationId());
         providerRepository.saveAll(List.of(google, kakao, naver));
     }
-
 
     @Test
     @DisplayName("이미 가입된 구글 유저인 경우 유저 정보를 응답해야 한다.")
@@ -178,9 +184,10 @@ public class OAuthServiceTest {
         // then
         assertThat(result).isNotNull();
         Map<String, Object> resultAttributes = result.getAttributes();
+        Provider providerObject = (Provider) resultAttributes.get("provider");
         assertThat(resultAttributes.get("name")).isEqualTo(name);
         assertThat(resultAttributes.get("email")).isEqualTo(email);
-        assertThat(resultAttributes.get("provider")).isEqualTo(provider);
+        assertThat(providerObject.getName()).isEqualTo(provider);
     }
 
     @Test
@@ -206,9 +213,10 @@ public class OAuthServiceTest {
         // then
         assertThat(result).isNotNull();
         Map<String, Object> resultAttributes = result.getAttributes();
+        Provider providerObject = (Provider) resultAttributes.get("provider");
         assertThat(resultAttributes.get("name")).isEqualTo(name);
         assertThat(resultAttributes.get("email")).isEqualTo(email);
-        assertThat(resultAttributes.get("provider")).isEqualTo(provider);
+        assertThat(providerObject.getName()).isEqualTo(provider);
     }
 
     @Test
@@ -234,9 +242,10 @@ public class OAuthServiceTest {
         // then
         assertThat(result).isNotNull();
         Map<String, Object> resultAttributes = result.getAttributes();
+        Provider providerObject = (Provider) resultAttributes.get("provider");
         assertThat(resultAttributes.get("name")).isEqualTo(name);
         assertThat(resultAttributes.get("email")).isEqualTo(email);
-        assertThat(resultAttributes.get("provider")).isEqualTo(provider);
+        assertThat(providerObject.getName()).isEqualTo(provider);
     }
 
     private Provider createProvider(String registrationId) {

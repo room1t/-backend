@@ -5,4 +5,6 @@ import se.sowl.roomitdomain.user.domain.UserRole;
 
 public interface UserRoleRepository extends CrudRepository<UserRole, Long> {
     UserRole findByRole(String role);
+
+    void deleteAllInBatch();
 }

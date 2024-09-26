@@ -62,6 +62,16 @@ public class ReservationControllerTest {
     private List<SpaceDetail> spaceDetails;
     private Reservation existingReservation;
 
+    @AfterAll
+    void cleanUp() {
+        spaceDetailRepository.deleteAllInBatch();
+        spaceRepository.deleteAllInBatch();
+        userRepository.deleteAllInBatch();
+        providerRepository.deleteAllInBatch();
+        userRoleRepository.deleteAllInBatch();
+        reservationStatusRepository.deleteAllInBatch();
+    }
+
     @BeforeEach
     void setUp() {
         user = UserFixture.createUser("name", "nickname", "email", providerRepository.findByName("google"), userRoleRepository.findByRole("user"));

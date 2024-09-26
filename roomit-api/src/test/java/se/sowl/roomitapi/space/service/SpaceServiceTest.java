@@ -59,8 +59,17 @@ class SpaceServiceTest {
     @AfterEach
     void tearDown() {
         spaceDetailRepository.deleteAllInBatch();
-        spaceRepository.deleteAllInBatch(); // 자식. user_id _> owner_id로 쓰고있다.
-        userRepository.deleteAllInBatch(); // 부모. user_id 를 가지고있다.
+        spaceRepository.deleteAllInBatch();
+        userRepository.deleteAllInBatch();
+    }
+
+    @AfterAll
+    void cleanUp() {
+        spaceDetailRepository.deleteAllInBatch();
+        spaceRepository.deleteAllInBatch();
+        userRepository.deleteAllInBatch();
+        providerRepository.deleteAllInBatch();
+        userRoleRepository.deleteAllInBatch();
     }
 
     // NESTED 란 테스트 클래스를 만들어서 테스트 코드를 구조화하는 방법.
@@ -90,7 +99,7 @@ class SpaceServiceTest {
 
         @Test
         @DisplayName("사용자가 공간 목록을 조회했지만 공간이 없을 때, 빈 목록을 응답한다")
-        // TODO: STEP3: 테스트 코드를 작성한다.
+            // TODO: STEP3: 테스트 코드를 작성한다.
         void emptySpace() {
             // TODO: (given)은 테스트하고자 하는 메서드를 실행하기 전에 하는 사전작업,
             // TODO: 주로 테스트할 객체를 생성하거나 초기화하는 작업을 한다.
@@ -128,23 +137,23 @@ class SpaceServiceTest {
 
             for(int i=0;i<10;i++){ // 10개의 space,
                 Space space = Space.builder()
-                        .name("이디야")
-                        .description("성공회대 앞 2층")
-                        .address("구로구 어쩌구")
-                        .maxCapacity(30)
-                        .owner(user)
-                        .build();
+                    .name("이디야")
+                    .description("성공회대 앞 2층")
+                    .address("구로구 어쩌구")
+                    .maxCapacity(30)
+                    .owner(user)
+                    .build();
 
                 SpaceDetail spaceDetail;
 
                 for(int j=0;j<3;j++) { // 30개의 spaceDeatil
                     spaceDetail = SpaceDetail.builder()
-                            .space(space)
-                            .name("테이블1")
-                            .description("원형입니다")
-                            .capacity(8)
-                            .pricePerHour(1.0)
-                            .build();
+                        .space(space)
+                        .name("테이블1")
+                        .description("원형입니다")
+                        .capacity(8)
+                        .pricePerHour(1.0)
+                        .build();
 
                     spaceDetails.add(spaceDetail);
                 }

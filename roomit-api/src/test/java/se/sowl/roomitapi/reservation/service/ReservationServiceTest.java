@@ -68,6 +68,16 @@ class ReservationServiceTest {
         userRepository.deleteAllInBatch();
     }
 
+    @AfterAll
+    void cleanUp() {
+        spaceDetailRepository.deleteAllInBatch();
+        spaceRepository.deleteAllInBatch();
+        userRepository.deleteAllInBatch();
+        providerRepository.deleteAllInBatch();
+        userRoleRepository.deleteAllInBatch();
+        reservationStatusRepository.deleteAllInBatch();
+    }
+
     @BeforeAll
     void setUp() {
         Provider google = new Provider("google");

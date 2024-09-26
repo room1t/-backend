@@ -55,6 +55,15 @@ class SpaceDetailServiceTest {
         userRepository.deleteAllInBatch(); // 부모. user_id 를 가지고있다.
     }
 
+    @AfterAll
+    void cleanUp() {
+        spaceDetailRepository.deleteAllInBatch();
+        spaceRepository.deleteAllInBatch();
+        userRepository.deleteAllInBatch();
+        providerRepository.deleteAllInBatch();
+        userRoleRepository.deleteAllInBatch();
+    }
+
     @BeforeAll
     void setUp() {
         Provider google = new Provider(OAuth2Provider.GOOGLE.getRegistrationId());
